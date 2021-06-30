@@ -1,0 +1,12 @@
+# this code was utilized to run scenic analysis
+# these commands were issued on an appropriately configured virtual machine on the Google Cloud
+
+docker run -it --rm -v /home/duncan_m_morgan/scenic:/scenicdata aertslab/pyscenic:0.9.18 pyscenic grn --num_workers 8 -o /scenicdata/expr_mat.adjacencies.tsv /scenicdata/eos_only.tsv /scenicdata/allTFs_hg38.txt
+wget https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg19/refseq_r45/mc9nr/gene_based/hg19-tss-centered-5kb-7species.mc9nr.feather
+wget https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg19/refseq_r45/mc9nr/gene_based/hg19-tss-centered-10kb-7species.mc9nr.feather
+wget https://resources.aertslab.org/cistarget/motif2tf/motifs-v9-nr.hgnc-m0.001-o0.0.tbl
+
+
+docker run -it --rm -v  /home/duncan_m_morgan/scenic:/scenicdata aertslab/pyscenic:0.9.18 pyscenic ctx /scenicdata/expr_mat.adjacencies.tsv /scenicdata/hg19-tss-centered-5kb-7species.mc9nr.feather scenicdata/hg19-tss-centered-10kb-7species.mc9nr.feather --annotations_fname /scenicdata/motifs-v9-nr.hgnc-m0.001-o0.0.tbl --expression_mtx_fname /scenicdata/eos_only.tsv --mode "dask_multiprocessing" --output /scenicdata/regulons.csv  --num_workers 7
+
+docker run -it --rm -v /home/duncan_m_morgan/scenic:/scenicdata aertslab/pyscenic:0.9.18 pyscenic aucell /scenicdata/eos_only.tsv  /scenicdata/regulons.csv -o /scenicdata/auc_mtx.csv --num_workers 8
